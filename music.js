@@ -1,87 +1,94 @@
 export class AudioPlayer {
-  static #STYLES_ATTACHED = false
-  #audioUrl
-  #coverImageUrl
-  #title
-  #artist
-  #progressEl
-  #coverImageEl
-  #parentEl
-  #audio
-  #el
-  
+  static #STYLES_ATTACHED = false;
+  #audioUrl;
+  #coverImageUrl;
+  #title;
+  #artist;
+  #progressEl;
+  #coverImageEl;
+  #parentEl;
+  #audio;
+  #el;
+
   constructor() {
     // força que as funções mantenham o `this` mesmo quando acionadas
     // por eventos (usando o fn.bind(this))
-    this.#playOrPause = this.#playOrPause.bind(this)
-    this.#updateProgress = this.#updateProgress.bind(this)
+    this.#playOrPause = this.#playOrPause.bind(this);
+    this.#updateProgress = this.#updateProgress.bind(this);
   }
-  
-  start({audioUrl, coverImageUrl, title, artist}, parentEl) {
-    this.#audioUrl = audioUrl
-    this.#coverImageUrl = coverImageUrl
-    this.#title = title
-    this.#artist = artist
-    this.#parentEl = parentEl
 
-    const template = this.#render()
-    this.#el = document.createRange().createContextualFragment(template).firstElementChild
-    this.#el.querySelector('.audio-play-pause').addEventListener('click', this.#playOrPause)
-    this.#progressEl = this.#el.querySelector('.audio-progress')
-    this.#progressEl.value = 0
-    this.#coverImageEl = this.#el.querySelector('.audio-cover')
-    
+  start({ audioUrl, coverImageUrl, title, artist }, parentEl) {
+    this.#audioUrl = audioUrl;
+    this.#coverImageUrl = coverImageUrl;
+    this.#title = title;
+    this.#artist = artist;
+    this.#parentEl = parentEl;
+
+    const template = this.#render();
+    this.#el = document
+      .createRange()
+      .createContextualFragment(template).firstElementChild;
+    this.#el
+      .querySelector(".audio-play-pause")
+      .addEventListener("click", this.#playOrPause);
+    this.#progressEl = this.#el.querySelector(".audio-progress");
+    this.#progressEl.value = 0;
+    this.#coverImageEl = this.#el.querySelector(".audio-cover");
+
     if (!AudioPlayer.#STYLES_ATTACHED) {
-      const styleEl = document.createElement('style')
-      styleEl.innerHTML = AudioPlayer.#styles
-      document.head.appendChild(styleEl)
-      
-      AudioPlayer.#STYLES_ATTACHED = true
+      const styleEl = document.createElement("style");
+      styleEl.innerHTML = AudioPlayer.#styles;
+      document.head.appendChild(styleEl);
+
+      AudioPlayer.#STYLES_ATTACHED = true;
     }
-    
-    this.#parentEl.appendChild(this.#el)
-    this.#audio = new Audio(this.#audioUrl)
-    this.#audio.volume = 0.05
-    this.#audio.addEventListener('timeupdate', this.#updateProgress)
-    
-    setTimeout(() => this.#progressEl.style.width = this.#el.offsetHeight + 'px', 0)
+
+    this.#parentEl.appendChild(this.#el);
+    this.#audio = new Audio(this.#audioUrl);
+    this.#audio.volume = 0.05;
+    this.#audio.addEventListener("timeupdate", this.#updateProgress);
+
+    setTimeout(
+      () => (this.#progressEl.style.width = this.#el.offsetHeight + "px"),
+      0
+    );
   }
 
   #playOrPause = () => {
     if (this.playing) {
-      this.pause()
+      this.pause();
     } else {
-      this.play()
+      this.play();
     }
-  }
+  };
 
   play() {
     if (this.#audio) {
       if (this.#audio.currentTime >= this.#audio.duration) {
-        this.#audio.currentTime = 0
+        this.#audio.currentTime = 0;
       }
-      this.#audio.play()
-      this.#coverImageEl.classList.add('spinning')
+      this.#audio.play();
+      this.#coverImageEl.classList.add("spinning");
     }
   }
 
   pause() {
-    this.#audio.pause()
-    this.#coverImageEl.classList.remove('spinning')
+    this.#audio.pause();
+    this.#coverImageEl.classList.remove("spinning");
   }
 
   #updateProgress = () => {
-    this.#progressEl.value = this.#audio.currentTime / this.#audio.duration
+    this.#progressEl.value = this.#audio.currentTime / this.#audio.duration;
     if (this.#audio.currentTime >= this.#audio.duration) {
-      this.pause()
+      this.pause();
     }
-  }
+  };
 
   get playing() {
-    return !this.#audio?.paused
+    return !this.#audio?.paused;
   }
 
- #render() {
+  #render() {
     return `
       <div class="audio-player">
         <div class="audio-cover-container">
@@ -105,7 +112,7 @@ export class AudioPlayer {
         </div>
         <progress value="0" max="1" class="audio-progress"></progress>
       </div>
-    `
+    `;
   }
 
   static get #styles() {
@@ -231,14 +238,12 @@ export class AudioPlayer {
         }
       }
 
-    `
+    `;
   }
 }
 
+let player = new AudioPlayer();
 
-let player = new AudioPlayer()
-
-export function play({audioUrl, coverImageUrl, title, artist}, parentEl) {
-  player.start({audioUrl, coverImageUrl, title, artist}, parentEl)
+export function play({ audioUrl, coverImageUrl, title, artist }, parentEl) {
+  player.start({ audioUrl, coverImageUrl, title, artist }, parentEl);
 }
-
